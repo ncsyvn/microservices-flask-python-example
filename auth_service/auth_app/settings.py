@@ -27,9 +27,8 @@ class ProdConfig(Config):
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
     # mysql config
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@microservices-flask/mn_prd'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@127.0.0.1:3306/auth_service'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-
 
 
 class StgConfig(Config):
@@ -50,5 +49,5 @@ class StgConfig(Config):
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
     # mysql config
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@microservices-flask/mn_prd'
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:123456@127.0.0.1:3306/auth_service'
     SQLALCHEMY_TRACK_MODIFICATIONS = True

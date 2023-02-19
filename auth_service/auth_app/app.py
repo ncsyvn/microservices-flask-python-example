@@ -2,7 +2,10 @@
 
 from flask import Flask
 from auth_app.api.helper import CONFIG
-from auth_app.extensions import logger, db, migrate
+from auth_app.extensions import jwt, db, migrate
+from auth_app.models import User, Token
+from .api import v1 as api_v1
+
 
 def create_app(config_object=CONFIG):
     """
@@ -13,6 +16,7 @@ def create_app(config_object=CONFIG):
     app = Flask(__name__, static_url_path="", static_folder="./static-files")
     app.config.from_object(config_object)
     register_extensions(app)
+    register_blueprints(app)
     return app
 
 
@@ -25,5 +29,14 @@ def register_extensions(app):
 
     db.app = app
     db.init_app(app)  # SQLAlchemy
-    # jwt.init_app(app)
+    jwt.init_app(app)
     migrate.init_app(app, db)
+
+
+def register_blueprints(app):
+    """
+    Init blueprint for api url
+    :param app:
+    :return:
+    """
+    app.register_blueprint(api_v1.auth.api, url_prefix='/api/v1/auth')

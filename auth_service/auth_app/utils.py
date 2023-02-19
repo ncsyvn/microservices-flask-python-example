@@ -11,6 +11,7 @@ from marshmallow import fields, validate as validate_
 from pytz import timezone
 from .extensions import logger
 import re
+from auth_app.enums import TIME_FORMAT_LOG
 
 
 class FieldString(fields.String):
@@ -91,18 +92,6 @@ def logged_error(error: str) -> None:
                 request.scheme,
                 request.full_path,
                 error)
-
-
-def allowed_file(filename: str) -> bool:
-    """
-
-    Args:
-        filename:
-
-    Returns:
-
-    """
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS_FILES
 
 
 def get_datetime_now() -> datetime:

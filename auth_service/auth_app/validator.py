@@ -112,20 +112,20 @@ class MessageSchema(Schema):
     message = fields.String()
 
 
-class RegisterUserSchema(Schema):
+class SignupUserSchema(Schema):
     """
     Validator
     :param
-        full_name: string, required
-        phone: string, required
+        email: string, required
+        password: string, required
     Ex:
     {
-        "full_name": "Nguyen Van A",
-        "phone": "09123123"
+        "email": "sy123456@gmail.com",
+        "password": "12345678aA@"
     }
     """
-    full_name = fields.String(required=True, validate=validate.Length(min=1, max=50))
-    phone = fields.String(required=True, validate=validate.Length(min=1, max=20))
+    email = fields.String(required=True, validate=validate.Length(min=1, max=50))
+    password = fields.String(required=True, validate=validate.Length(min=1, max=50))
 
 
 class RegisterCheckOPTSchema(Schema):
@@ -442,37 +442,6 @@ class GetArticleValidation(Schema):
                          validate=validate.OneOf(
                              ["type", "title", "link", "created_date", "modified_date", "end_date"]))
     order_by = fields.String(required=False, validate=validate.OneOf(["asc", "desc"]))
-
-
-class ArticleValidation(Schema):
-    """
-    Marshmallow Schema
-    Target: validate parameters of article
-    """
-    type = fields.Integer(required=True, validate=validate.OneOf([NEWS_TYPE, EVENT_TYPE]))  # 0 => Tin tức, 1 => sự kiện
-    title = fields.String(required=True, validate=validate.Length(min=1, max=200))
-    link = fields.String(required=False, validate=validate.Length(min=0, max=500))
-    content = fields.String(required=False, validate=validate.Length(min=200, max=10000))
-    start_date = fields.Integer(required=False)
-    image_url = fields.String(required=True, validate=validate.Length(min=0, max=250))
-    is_ads = fields.Boolean(required=False)
-    banner_image_url = fields.String(required=False, validate=validate.Length(min=0, max=250))
-    dialog_image_url = fields.String(required=False, validate=validate.Length(min=0, max=250))
-    end_date = fields.Integer(required=False)
-
-    @validates_schema
-    def validate_multi_method(self, data, **kwargs):
-        # validate for two type news/event
-        if data.get('type') == NEWS_TYPE:
-            if not data.get('link', None):
-                raise ValidationError("Missing link field")
-        # EVENT_TYPE
-        elif data.get('type') == EVENT_TYPE:
-            if not data.get('start_date') or not data.get('content'):
-                raise ValidationError("Missing one of [content, start_date] fields")
-            if data.get('is_ads'):
-                if not data.get('banner_image_url') or not data.get('dialog_image_url') or not data.get('end_date'):
-                    raise ValidationError("Missing one of [banner_image_url, dialog_image_url, end_date] fields")
 
 
 class ArticleIdsValidation(Schema):
@@ -928,76 +897,6 @@ class OrderUpdateTypeValidate(Schema):
     type = fields.String(validate=validate.OneOf(choices=["status", "shipper_info"],
                                                  error="type must be one of [status, shipper_info]"))
 
-
-class OrderStatusValidation(Schema):
-    """
-    Marshmallow Schema
-    Author: LyChan
-    Target: Use for admin to manage change orders status
-    Ex:
-    {
-        "cancel_reason": "Some thing i don't now"
-        "status": 7
-    }
-    """
-    cancel_reason = fields.String(validate=validate.Length(min=0, max=500))
-    delivered_date = fields.Integer()
-    status = fields.Number(required=True,
-                           validate=validate.OneOf(
-                               choices=[UNPAID, MONEY_TRANSFERRED, RECEIVED_MONEY, PACKING, DELIVERING,
-                                        SUCCESSFUL_DELIVERY, CANCELED],
-                               error="Status must be "
-                                     "[1 ~ UNPAID, 2 ~ MONEY_TRANSFERRED, 3 ~ RECEIVED_MONEY, "
-                                     "4 ~ PACKING, 5 ~ DELIVERING, 6 ~ SUCCESSFUL_DELIVERY, 7 ~ CANCELED]"))
-
-
-class OrderShipperInfoValidation(Schema):
-    """
-    Marshmallow Schema
-    Author: LyChan
-    Target: Use for admin to manage update shipper info validation
-    """
-
-    shipping_unit = fields.String(required=True, validate=validate.Length(min=1, max=100))
-    handover_shipping = fields.Number(required=True)
-    shipper_name = fields.String(validate=validate.Length(min=0, max=50))
-    shipper_phone = fields.String(validate=validate.Length(min=0, max=20))
-    expected_delivery = fields.Integer(required=True)
-    status = fields.Number(required=True,
-                           validate=validate.OneOf(
-                               choices=[UNPAID, MONEY_TRANSFERRED, RECEIVED_MONEY, PACKING, DELIVERING,
-                                        SUCCESSFUL_DELIVERY, CANCELED],
-                               error="Status must be "
-                                     "[1 ~ UNPAID, 2 ~ MONEY_TRANSFERRED, 3 ~ RECEIVED_MONEY, "
-                                     "4 ~ PACKING, 5 ~ DELIVERING, 6 ~ SUCCESSFUL_DELIVERY, 7 ~ CANCELED]"))
-
-
-class FilterDiscountValidate(Schema):
-    """
-    Marshmallow Schema
-    Author: LyChan
-    Target: Use for admin to search discount
-    """
-    page = fields.Integer()
-    page_size = fields.Integer()
-    code = fields.String(validate=[validate.Length(min=1, max=20)])
-    sort = fields.String(validate=validate.OneOf(
-        choices=["code", "created_date", "discount_percent", "discount_value",
-                 "discount_type", "description", "start_discount_date", "end_discount_date",
-                 "number_use", "number_user_used", "quantity"],
-        error="Sort must be one of these columns [code, created_date, discount_type, description, "
-              "start_discount_date, discount_percent, end_discount_date, number_use, number_user_used or quantity]"))
-    order_by = fields.String(validate=validate.OneOf(choices=["asc", "desc"],
-                                                     error="Order by must be one of [asc, desc]"))
-    type = fields.Integer(validate=validate.OneOf(
-        choices=[DISCOUNT_PERCENT, FREE_SHIP, REFUND],
-        error="Type must be one of "
-              "[1 ~ DISCOUNT_PERCENT, 2 ~ FREE_SHIP, 3 ~ REFUND]"))
-
-    status = fields.Integer(validate=validate.OneOf(
-        choices=[ALL, NOT_APPLY, APPLYING, APPLIED],
-        error="Status must be one of "
-              "[0 ~ ALL, 1 ~ NOT_APPLY, 2 ~ APPLYING, 3 ~ APPLIED]"))
 
 
 class OrderSchema(Schema):

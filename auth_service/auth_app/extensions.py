@@ -2,11 +2,11 @@ import logging
 import os
 
 from flask_sqlalchemy import SQLAlchemy
-# from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
 from logging.handlers import RotatingFileHandler
 
-# jwt = JWTManager()
+jwt = JWTManager()
 
 # init SQLAlchemy
 db = SQLAlchemy()
