@@ -1,9 +1,7 @@
 # coding: utf-8
 import uuid
-
 from flask_jwt_extended import decode_token, get_jwt_identity, get_raw_jwt
 from sqlalchemy.dialects.mysql import INTEGER
-
 from auth_app.extensions import db
 from auth_app.utils import get_timestamp_now
 
@@ -31,12 +29,6 @@ class User(db.Model):
     def get_by_id(cls, _id):
         return cls.query.get(_id)
 
-    @property
-    def order_number(self):
-        # sort order number by code
-        order_number = len([item for item in self.order_actives if item.is_active])
-        return order_number
-
 
 class Token(db.Model):
     __tablename__ = 'token'
@@ -60,7 +52,7 @@ class Token(db.Model):
         token_type = decoded_token['type']
         expires = decoded_token['exp']
         revoked = False
-        _id = str(uuid.uuid1())
+        _id = str(uuid.uuid4())
 
         db_token = Token(
             id=_id,
@@ -72,75 +64,6 @@ class Token(db.Model):
         )
         db.session.add(db_token)
         db.session.commit()
-
-    @staticmethod
-    def is_token_revoked(decoded_token):
-        """
-        Checks if the given token is revoked or not. Because we are adding all the
-        token that we create into this database, if the token is not present
-        in the database we are going to consider it revoked, as we don't know where
-        it was created.
-        """
-        jti = decoded_token['jti']
-        token = Token.query.filter_by(jti=jti).first()
-        if token:
-            return token.revoked
-        return True
-
-    @staticmethod
-    def revoke_token(jti):
-        """
-        Revokes the given token. Raises a TokenNotFound error if the token does
-        not exist in the database
-        """
-        try:
-            token = Token.query.filter_by(jti=jti).first()
-            token.revoked = True
-            db.session.commit()
-        except Exception as ex:
-            return str(ex)
-
-    @staticmethod
-    def revoke_all_token(users_identity):
-        """
-        Revokes the given token. Raises a TokenNotFound error if the token does
-        not exist in the database.
-        Set token Revoked flag is False to revoke this token.
-        Args:
-            users_identity: list or string, require
-                list user id or user_id. Used to query all token of the user on the database
-        """
-        try:
-            if type(users_identity) is not list:
-                # convert user_id to list user_ids
-                users_identity = [users_identity]
-
-            tokens = Token.query.filter(Token.user_identity.in_(users_identity), Token.revoked == 0).all()
-
-            for token in tokens:
-                token.revoked = True
-            db.session.commit()
-        except Exception as ex:
-            return str(ex)
-
-    @staticmethod
-    def revoke_all_token2(users_identity):
-        """
-        Revokes all token of the given user except current token. Raises a TokenNotFound error if the token does
-        not exist in the database.
-        Set token Revoked flag is False to revoke this token.
-        Args:
-            users_identity: user id
-        """
-        jti = get_raw_jwt()['jti']
-        try:
-            tokens = Token.query.filter(Token.user_identity == users_identity, Token.revoked == 0,
-                                        Token.jti != jti).all()
-            for token in tokens:
-                token.revoked = True
-            db.session.commit()
-        except Exception as ex:
-            return str(ex)
 
     @staticmethod
     def prune_database():

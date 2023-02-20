@@ -3,8 +3,8 @@
 from flask import Flask
 from auth_app.api.helper import CONFIG
 from auth_app.extensions import jwt, db, migrate
-from auth_app.models import User, Token
 from .api import v1 as api_v1
+from auth_app.models import User, Token  # Must have to migrate db
 
 
 def create_app(config_object=CONFIG):
