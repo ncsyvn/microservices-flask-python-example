@@ -66,7 +66,7 @@
 
 
 This source show you a basic microservices system with python language and Flask framework.
-There are 2 mini services connect directly with their apis:
+There are 2 mini services that connect directly with its apis:
 * Authentication service
     * signup
     * login
