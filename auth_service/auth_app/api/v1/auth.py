@@ -8,21 +8,12 @@ from auth_app.api.helper import send_error, send_result
 from auth_app.utils import logged_input, get_timestamp_now
 from auth_app.validator import SignupBodyValidation, LoginBodyValidation, UserSchema
 from auth_app.models import User, Token
-from auth_app.extensions import db
+from auth_app.extensions import db, jwt
+from flask_jwt_extended import verify_jwt_in_request
 
 ACCESS_EXPIRES = timedelta(days=1)
 REFRESH_EXPIRES = timedelta(days=5)
 api = Blueprint('auth', __name__)
-
-# Message_ID variable
-NEW_OTP_SENT = '301'
-WRONG_OTP = '305'
-OTP_EXPIRED = '306'
-PHONE_DOES_NOT_EXISTS = '307'
-WRONG_PHONE_PASSWORD = '308'
-INCORRECT_EMAIL_PASSWORD = "396"
-INACTIVE_ACCOUNT_ERROR = "414"
-SESSION_EXPIRED = '343'
 
 
 @api.route('/signup', methods=['POST'])
@@ -41,7 +32,7 @@ def signup():
     try:
         json_req = request.get_json()
     except Exception as ex:
-        return send_error(message="Request Body incorrect json format: " + str(ex), code=442)
+        return send_error(message='Request Body incorrect json format: ' + str(ex), code=442)
 
     # Log request api
     logged_input(json.dumps(json_req))
@@ -59,13 +50,13 @@ def signup():
     # validate request body
     is_not_validate = SignupBodyValidation().validate(json_body)  # Dictionary show detail error fields
     if is_not_validate:
-        return send_error(data=is_not_validate, message="Invalid parameters")
+        return send_error(data=is_not_validate, message='Invalid parameters')
 
-    email = json_body.get("email")
-    password = json_body.get("password")
+    email = json_body.get('email')
+    password = json_body.get('password')
     duplicated_user = User.query.filter(User.email == email).first()
     if duplicated_user:
-        return send_error(message="User existed")
+        return send_error(message='User existed')
 
     created_date = get_timestamp_now()
     _id = str(uuid.uuid4())
@@ -75,7 +66,7 @@ def signup():
     db.session.commit()
 
     data = {
-        "user_id": _id
+        'user_id': _id
     }
 
     return send_result(data=data)
@@ -102,7 +93,7 @@ def login():
     try:
         json_req = request.get_json()
     except Exception as ex:
-        return send_error(message="Request Body incorrect json format: " + str(ex), code=442)
+        return send_error(message='Request Body incorrect json format: ' + str(ex), code=442)
 
     logged_input(json.dumps(json_req))
     if json_req is None:
@@ -116,15 +107,15 @@ def login():
     # validate request body
     is_not_validate = LoginBodyValidation().validate(json_body)  # Dictionary show detail error fields
     if is_not_validate:
-        return send_error(data=is_not_validate, message="Invalid params")
+        return send_error(data=is_not_validate, message='Invalid params')
 
     # Check username and password
-    email = json_body.get("email")
-    password = json_body.get("password")
+    email = json_body.get('email')
+    password = json_body.get('password')
 
     user = User.query.filter(User.email == email).first()
     if user is None or (password and not check_password_hash(user.password_hash, password)):
-        return send_error(message="Login failed")
+        return send_error(message='Login failed')
 
     access_token = create_access_token(identity=user.id, expires_delta=ACCESS_EXPIRES)
     refresh_token = create_refresh_token(identity=user.id, expires_delta=REFRESH_EXPIRES)
@@ -137,4 +128,19 @@ def login():
     data.setdefault('access_token', access_token)
     data.setdefault('refresh_token', refresh_token)
 
-    return send_result(data=data, message="Logged in successfully!")
+    return send_result(data=data, message='Logged in successfully!')
+
+
+@api.route('/tokens/validate', methods=['GET'])
+def validate_token():
+    """
+    Validate access_token api
+
+    Requests Header:
+            Authorization: string, require
+
+    Returns:
+            validate or not
+    """
+    verify_jwt_in_request()
+    return send_result(message='Token valid')
