@@ -6,4 +6,4 @@ if __name__ == '__main__':
     Main Video Application
     python manage.py
     """
-    app.run(host='0.0.0.0', port=5012)
+    app.run(host='0.0.0.0', port=5013)

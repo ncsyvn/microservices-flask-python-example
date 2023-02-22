@@ -44,7 +44,7 @@ def create_new_video():
     try:
         json_req = request.get_json()
     except Exception as ex:
-        return send_error(message="Request Body incorrect json format: " + str(ex), code=442)
+        return send_error(message='Request Body incorrect json format: ' + str(ex), code=442)
 
     logged_input(json.dumps(json_req))
     if json_req is None:
@@ -58,17 +58,17 @@ def create_new_video():
     # validate request body
     is_not_validate = CreateVideoSchema().validate(json_body)  # Dictionary show detail error fields
     if is_not_validate:
-        return send_error(data=is_not_validate, message="Invalid params")
+        return send_error(data=is_not_validate, message='Invalid params')
 
-    title = json_body.get("title")
-    url = json_body.get("url", "")
-    thumbnail_url = json_body.get("thumbnail_url", "")
+    title = json_body.get('title')
+    url = json_body.get('url', '')
+    thumbnail_url = json_body.get('thumbnail_url', '')
     _id = str(uuid.uuid4())
     # Store video to db
     new_video = Video(id=_id, title=title, url=url, thumbnail_url=thumbnail_url)
     db.session.add(new_video)
     db.session.commit()
     data = {
-        "video_id": _id
+        'video_id': _id
     }
     return send_result(data)
