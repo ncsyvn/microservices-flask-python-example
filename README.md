@@ -73,7 +73,6 @@ There are 2 mini services connect directly with their apis:
 * Video service
     * create new video
     * get list videos
-    * get detail video
 
 <a href="https://github.com/ncsyvn/microservices-flask-python-example/images/microservices-architecture.png">
     <img src="images/microservices-architecture.png" alt="Architecture">
