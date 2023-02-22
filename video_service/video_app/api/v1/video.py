@@ -7,7 +7,7 @@ from video_app.validator import CreateVideoSchema, VideoSchema
 from video_app.models import Video
 from video_app.api.helper import send_error, send_result
 from video_app.extensions import db
-
+from video_app.gateway import authorization_require
 
 api = Blueprint('videos', __name__)
 
@@ -29,6 +29,7 @@ def search_videos():
 
 
 @api.route('', methods=['POST'])
+@authorization_require()
 def create_new_video():
     """
     Create new video API.
