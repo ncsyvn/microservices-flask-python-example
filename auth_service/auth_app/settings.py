@@ -23,7 +23,7 @@ class ProdConfig(Config):
 
     # JWT Config
     JWT_SECRET_KEY = '12345678a@@@'
-    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_ENABLED = False
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
     # mysql config
@@ -45,7 +45,7 @@ class StgConfig(Config):
 
     # JWT Config
     JWT_SECRET_KEY = '1234567a@'
-    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_ENABLED = False
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
 
     # mysql config
