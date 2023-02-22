@@ -146,8 +146,20 @@ Below is an instruction for installing and setting up auth_service. Do the same 
 
 <!-- Test service -->
 ## Test service
-
-
+This is the postman collection to testing your API
+* [[Postman collection]][postman-testing-url]
+<div align="center">
+    <h12>Create new video with valid token example</h12>
+</div>
+<a href="https://github.com/ncsyvn/microservices-flask-python-example/images/create-video-success-with-token.png">
+    <img src="images/create-video-success-with-token.png" alt="Create video success with valid token">
+</a>
+<div align="center">
+    <h12>Create new video with failed without token</h12>
+</div>
+<a href="https://github.com/ncsyvn/microservices-flask-python-example/images/create-video-failed-without-token.png">
+    <img src="images/create-video-failed-without-token.png" alt="Create video failed without">
+</a>
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -211,3 +223,4 @@ Other projects: [https://github.com/ncsyvn?tab=repositories](https://github.com/
 [install-pip-url]: https://pip.pypa.io/en/stable/installation/
 [download-mysql-url]: https://dev.mysql.com/downloads/installer/
 [download-postman-url]: https://www.postman.com/
+[postman-testing-url]: https://elements.getpostman.com/redirect?entityId=8820631-7d76b73e-dc98-41f1-b16e-cfafed1bd431&entityType=collection
